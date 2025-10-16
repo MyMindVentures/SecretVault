@@ -1,0 +1,91 @@
+{
+  "name": "no-code-secrets-manager",
+  "description": "AI Secrets Orchestrator - Intelligent secrets management SaaS for no-coders",
+  "type": "web",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/your-username/no-code-secrets-manager.git",
+    "branch": "main",
+    "buildContext": "."
+  },
+  "build": {
+    "type": "dockerfile",
+    "dockerfile": "Dockerfile",
+    "buildArgs": {},
+    "context": "."
+  },
+  "deploy": {
+    "replicas": 2,
+    "resources": {
+      "cpu": "0.5",
+      "memory": "1Gi"
+    },
+    "autoscaling": {
+      "enabled": true,
+      "minReplicas": 1,
+      "maxReplicas": 10,
+      "targetCPU": 70,
+      "targetMemory": 80
+    },
+    "healthCheck": {
+      "path": "/",
+      "port": 3000,
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
+    }
+  },
+  "networking": {
+    "ports": [
+      {
+        "port": 3000,
+        "protocol": "http",
+        "public": true
+      }
+    ],
+    "domains": [
+      {
+        "domain": "nocodesecrets.com",
+        "ssl": true
+      }
+    ]
+  },
+  "environment": {
+    "NODE_ENV": "production",
+    "VITE_APP_NAME": "No-Code Secrets Manager",
+    "VITE_APP_VERSION": "1.0.0",
+    "VITE_APP_DESCRIPTION": "AI Secrets Orchestrator for no-coders"
+  },
+  "secrets": {
+    "source": "doppler",
+    "project": "no-code-secrets-manager",
+    "config": "production"
+  },
+  "volumes": [],
+  "logging": {
+    "level": "info",
+    "retention": "30d"
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": true,
+    "alerts": [
+      {
+        "name": "high-cpu",
+        "condition": "cpu > 80%",
+        "duration": "5m"
+      },
+      {
+        "name": "high-memory",
+        "condition": "memory > 85%",
+        "duration": "5m"
+      },
+      {
+        "name": "service-down",
+        "condition": "health_check_failed",
+        "duration": "1m"
+      }
+    ]
+  }
+}

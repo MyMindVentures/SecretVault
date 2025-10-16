@@ -5,8 +5,8 @@ Write-Host "🤖 FULLY AUTOMATED NorthFlank Deployment Starting..." -ForegroundC
 Write-Host "No manual steps required - everything will be done automatically!" -ForegroundColor Green
 
 # Get credentials
-$token = doppler secrets get NORTHFLANK_API_TOKEN --project no-code-secrets-manager --config prd --plain
-$orgId = doppler secrets get NORTHFLANK_ORG_ID --project proof-of-mind-pwa --config production --plain
+$token = doppler secrets get NORTHFLANK_API_TOKEN --project secretvault --config prd --plain
+$orgId = doppler secrets get NORTHFLANK_ORG_ID --project proof-of-mind-from-chaos-to-clarity --config production --plain
 
 Write-Host "✅ Got NorthFlank credentials" -ForegroundColor Green
 
@@ -19,7 +19,7 @@ $headers = @{
 # Step 1: Create or get project
 Write-Host "🏗️ Creating/getting project..." -ForegroundColor Yellow
 $projectData = @{
-    name = "no-code-secrets-manager"
+    name = "secretvault"
     description = "AI Secrets Orchestrator - Intelligent secrets management SaaS for no-coders"
     organizationId = $orgId
 } | ConvertTo-Json
@@ -32,7 +32,7 @@ try {
     # Project might exist, try to get it
     try {
         $projects = Invoke-RestMethod -Uri "https://api.northflank.com/v1/projects" -Method GET -Headers $headers
-        $existingProject = $projects | Where-Object { $_.name -eq "no-code-secrets-manager" }
+        $existingProject = $projects | Where-Object { $_.name -eq "secretvault" }
         if ($existingProject) {
             $projectId = $existingProject.id
             Write-Host "✅ Using existing project: $projectId" -ForegroundColor Green
@@ -48,7 +48,7 @@ try {
 # Step 2: Create service
 Write-Host "🔧 Creating service..." -ForegroundColor Yellow
 $serviceData = @{
-    name = "no-code-secrets-manager"
+    name = "secretvault"
     description = "AI Secrets Orchestrator SaaS"
     type = "web"
     projectId = $projectId
@@ -96,7 +96,7 @@ $serviceData = @{
     }
     secrets = @{
         source = "doppler"
-        project = "no-code-secrets-manager"
+        project = "secretvault"
         config = "prd"
     }
 } | ConvertTo-Json -Depth 10
@@ -109,7 +109,7 @@ try {
     # Service might exist, try to get it
     try {
         $services = Invoke-RestMethod -Uri "https://api.northflank.com/v1/projects/$projectId/services" -Method GET -Headers $headers
-        $existingService = $services | Where-Object { $_.name -eq "no-code-secrets-manager" }
+        $existingService = $services | Where-Object { $_.name -eq "secretvault" }
         if ($existingService) {
             $serviceId = $existingService.id
             Write-Host "✅ Using existing service: $serviceId" -ForegroundColor Green
@@ -157,7 +157,7 @@ try {
     $serviceUrl = $serviceDetails.url
     Write-Host "✅ Service URL: $serviceUrl" -ForegroundColor Green
 } catch {
-    $serviceUrl = "https://no-code-secrets-manager.northflank.app"
+    $serviceUrl = "https://secretvault.northflank.app"
     Write-Host "✅ Default service URL: $serviceUrl" -ForegroundColor Green
 }
 

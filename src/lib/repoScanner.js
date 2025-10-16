@@ -28,7 +28,9 @@ export function extractProjectMetadata(files) {
           description: json.description || 'Project description not provided.',
         }
       }
-    } catch {}
+    } catch {
+      // Ignore JSON parsing errors
+    }
   }
   // Fallback to README.md first header/first paragraph
   const readme = files.find((f) => /readme\.md$/i.test(f.path))
